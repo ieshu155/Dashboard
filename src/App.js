@@ -1,5 +1,7 @@
 import * as React from "react";
-import { Routes, Route, Outlet, Link } from "react-router-dom";
+import { Routes, Route, Outlet, Link, Redirect } from "react-router-dom";
+// import { Redirect, } from "react-router";
+import { useAuthState } from "./configs/firebase";
 import Appointments from "./Views/appointments/Appointments";
 import Dashboard from "./Views/dashboard/Dashboard";
 import Prescriptions from "./Views/perscriptions/Prescriptions";
@@ -35,6 +37,33 @@ export default function App() {
       </Routes>
     </div>
   );
+}
+
+
+const AuthenticatedRoute = ({ component: C, ...props }) => {
+  const { isAuthenticated } = useAuthState()
+  console.log(`AuthenticatedRoute: ${isAuthenticated}`)
+  return (
+    <Route
+      {...props}
+      render={routeProps =>
+        isAuthenticated ? <C {...routeProps} /> : <Redirects to="/login" />
+      }
+    />
+  )
+}
+
+const UnauthenticatedRoute = ({ component: C, ...props }) => {
+  const { isAuthenticated } = useAuthState()
+  console.log(`UnauthenticatedRoute: ${isAuthenticated}`)
+  return (
+    <Route
+      {...props}
+      render={routeProps =>
+        !isAuthenticated ? <C {...routeProps} /> : <Redirect to="/" />
+      }
+    />
+  )
 }
 
 function Layout() {

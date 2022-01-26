@@ -1,6 +1,9 @@
 
 import firebase from 'firebase';
+import { useContext } from 'react';
+// import * as auth from 'firebase'
 
+// working package :      "firebase": "7.20.0",
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyD7w_alIje4A7DEr0G33toxrin5noPldy0",
@@ -13,3 +16,10 @@ const firebaseConfig = {
 
 
 export const app = firebase.initializeApp(firebaseConfig);
+export const auth = app.auth()
+
+export const useAuthState = () => {
+  const _auth = useContext(auth)
+  return { ..._auth, isAuthenticated: _auth.user != null }
+}
+
