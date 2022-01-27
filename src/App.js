@@ -1,134 +1,229 @@
+// import * as React from "react";
+// import { Routes, Route, Outlet, Link, Redirect } from "react-router-dom";
+// import AppNavigator from "./AppNavigator";
+// // import { Redirect, } from "react-router";
+// import { useAuthState } from "./configs/firebase";
+// import Appointments from "./Views/appointments/Appointments";
+// import Dashboard from "./Views/dashboard/Dashboard";
+// import { Login } from "./Views/login_test";
+// import Prescriptions from "./Views/perscriptions/Prescriptions";
+
+// export default function App() {
+//   return (
+
+//       <Routes>
+//         <Route path="/" element={<AppNavigator />}>
+//           <Route index element={<Dashboard />} />
+//           <Route path="appointments" element={<Appointments />} />
+//           <Route path="dashboard" element={<Dashboard />} />
+//           <Route path="prescriptions" element={<Prescriptions />} />
+//           <Route path="login" element={<Login />} />
+
+//           <Route path="*" element={<NoMatch />} />
+//         </Route>
+ 
+        
+//       </Routes>
+
+//   );
+// }
+
+
 import * as React from "react";
-import { Routes, Route, Outlet, Link, Redirect } from "react-router-dom";
-// import { Redirect, } from "react-router";
-import { useAuthState } from "./configs/firebase";
-import Appointments from "./Views/appointments/Appointments";
-import Dashboard from "./Views/dashboard/Dashboard";
-import Prescriptions from "./Views/perscriptions/Prescriptions";
+// import { auth, signin, signout } from "firebase";
+
+import {
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  useLocation,
+  Navigate,
+  Outlet
+} from "react-router-dom";
+import { getUser, signin, signout } from "./configs/firebase";
+// import { fakeAuthProvider } from "./auth";
 
 export default function App() {
+  // const a = auth
   return (
-    <div>
-      <h1>Basic Example</h1>
+    <AuthProvider>
+      <h1>Auth Example</h1>
 
       <p>
-        This example demonstrates some of the core features of React Router
-        including nested <code>&lt;Route&gt;</code>s,{" "}
-        <code>&lt;Outlet&gt;</code>s, <code>&lt;Link&gt;</code>s, and using a
-        "*" route (aka "splat route") to render a "not found" page when someone
-        visits an unrecognized URL.
+        This example demonstrates a simple login flow with three pages: a public
+        page, a protected page, and a login page. In order to see the protected
+        page, you must first login. Pretty standard stuff.
       </p>
 
-      {/* Routes nest inside one another. Nested route paths build upon
-            parent route paths, and nested route elements render inside
-            parent route elements. See the note about <Outlet> below. */}
-      <Routes>
-        <Route path="/" element={<AuthenticatedRoute />}>
-          <Route index element={<Dashboard />} />
-          <Route path="appointments" element={<Appointments />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="prescriptions" element={<Prescriptions />} />
+      <p>
+        First, visit the public page. Then, visit the protected page. You're not
+        yet logged in, so you are redirected to the login page. After you login,
+        you are redirected back to the protected page.
+      </p>
 
-          {/* Using path="*"" means "match anything", so this route
-                acts like a catch-all for URLs that we don't have explicit
-                routes for. */}
-          <Route path="*" element={<NoMatch />} />
+      <p>
+        Notice the URL change each time. If you click the back button at this
+        point, would you expect to go back to the login page? No! You're already
+        logged in. Try it out, and you'll see you go back to the page you
+        visited just *before* logging in, the public page.
+      </p>
+
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<PublicPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/protected"
+            element={
+              <RequireAuth>
+                <ProtectedPage />
+              </RequireAuth>
+            }
+          />
         </Route>
       </Routes>
-    </div>
+    </AuthProvider>
   );
-}
-
-
-const AuthenticatedRoute = ({ component: C, ...props }) => {
-  const { isAuthenticated } = useAuthState()
-  console.log(`AuthenticatedRoute: ${isAuthenticated}`)
-  return (
-    <Route
-      {...props}
-      render={routeProps =>
-        isAuthenticated ? <C {...routeProps} /> : <Link to="/login" />
-      }
-    />
-  )
-}
-
-const UnauthenticatedRoute = ({ component: C, ...props }) => {
-  const { isAuthenticated } = useAuthState()
-  console.log(`UnauthenticatedRoute: ${isAuthenticated}`)
-  return (
-    <Route
-      {...props}
-      render={routeProps =>
-        !isAuthenticated ? <C {...routeProps} /> : <Link to="/" />
-      }
-    />
-  )
 }
 
 function Layout() {
   return (
     <div>
-      {/* A "layout route" is a good place to put markup you want to
-          share across all the pages on your site, like navigation. */}
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/appointments">Appointments</Link>
-          </li>
-          <li>
-            <Link to="/dashboard">Dashboard</Link>
-          </li>
-          <li>
-            <Link to="/prescriptions">Prescriptions</Link>
-          </li>
-        </ul>
-      </nav>
+      <AuthStatus />
 
-      <hr />
+      <ul>
+        <li>
+          <Link to="/">Public Page</Link>
+        </li>
+        <li>
+          <Link to="/protected">Protected Page</Link>
+        </li>
+      </ul>
 
-      {/* An <Outlet> renders whatever child route is currently active,
-          so you can think about this <Outlet> as a placeholder for
-          the child routes we defined above. */}
       <Outlet />
     </div>
   );
 }
 
-// function Home() {
-//   return (
-//     <div>
-//       <h2>Home</h2>
-//     </div>
-//   );
-// }
+let AuthContextType = {
+  user: '',
+  signin: () => {},
+  signout: () => {}
+}
 
-// function About() {
-//   return (
-//     <div>
-//       <h2>About</h2>
-//     </div>
-//   );
-// }
+let AuthContext = React.createContext(AuthContextType);
 
-// function Dashboard() {
-//   return (
-//     <div>
-//       <h2>Dashboard</h2>
-//     </div>
-//   );
-// }
+function AuthProvider({ children }) {
+  // let [user, setUser] = React.useState();
+  const [userAuth, setUserAuth] = React.useState(AuthContextType)
+  React.useEffect(() => {
+    const getUserAuthObject = async () => await new Promise((res, rej) => res(setUserAuth({user: getUser(), signin: signin, signout: signout})))
+    getUserAuthObject()
+  }, [])
 
-function NoMatch() {
+  // let signin = (newUser, callback) => {
+  //   return fakeAuthProvider.signin(() => {
+  //     setUser(newUser);
+  //     callback();
+  //   });
+  // };
+
+  // let signout = (callback) => {
+  //   return fakeAuthProvider.signout(() => {
+  //     setUser(null);
+  //     callback();
+  //   });
+  // };
+
+  // let value = { user: getUser(), signin, signout };
+
+  return <AuthContext.Provider value={AuthContextType}>{children}</AuthContext.Provider>;
+}
+
+function useAuth() {
+  return React.useContext(AuthContext);
+}
+
+function AuthStatus() {
+  let auth = useAuth();
+  let navigate = useNavigate();
+
+  if (!auth.user) {
+    return <p>You are not logged in.</p>;
+  }
+
+  return (
+    <p>
+      Welcome {auth.user}!{" "}
+      <button
+        onClick={() => {
+          auth.signout(() => navigate("/"));
+        }}
+      >
+        Sign out
+      </button>
+    </p>
+  );
+}
+
+function RequireAuth({ children }) {
+  let auth = useAuth();
+  let location = useLocation();
+
+  if (!auth.user) {
+    // Redirect them to the /login page, but save the current location they were
+    // trying to go to when they were redirected. This allows us to send them
+    // along to that page after they login, which is a nicer user experience
+    // than dropping them off on the home page.
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
+
+function LoginPage() {
+  let navigate = useNavigate();
+  let location = useLocation();
+  let auth = useAuth();
+
+  let from = location.state?.from?.pathname || "/";
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    let formData = new FormData(event.currentTarget);
+    let username = formData.get("username");
+
+    auth.signin(username, () => {
+      // Send them back to the page they tried to visit when they were
+      // redirected to the login page. Use { replace: true } so we don't create
+      // another entry in the history stack for the login page.  This means that
+      // when they get to the protected page and click the back button, they
+      // won't end up back on the login page, which is also really nice for the
+      // user experience.
+      navigate(from, { replace: true });
+    });
+  }
+
   return (
     <div>
-      <h2>Nothing to see here!</h2>
-      <p>
-        <Link to="/">Go to the home page</Link>
-      </p>
+      <p>You must log in to view the page at {from}</p>
+
+      <form onSubmit={handleSubmit}>
+        <label>
+          Username: <input name="username" type="text" />
+        </label>{" "}
+        <button type="submit">Login</button>
+      </form>
     </div>
   );
+}
+
+function PublicPage() {
+  return <h3>Public</h3>;
+}
+
+function ProtectedPage() {
+  return <h3>Protected</h3>;
 }
