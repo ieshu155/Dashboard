@@ -23,7 +23,7 @@ export default function App() {
             parent route paths, and nested route elements render inside
             parent route elements. See the note about <Outlet> below. */}
       <Routes>
-        <Route path="/" element={<AuthenticatedRoute />}>
+        <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="appointments" element={<Appointments />} />
           <Route path="dashboard" element={<Dashboard />} />
@@ -40,31 +40,7 @@ export default function App() {
 }
 
 
-const AuthenticatedRoute = ({ component: C, ...props }) => {
-  const { isAuthenticated } = useAuthState()
-  console.log(`AuthenticatedRoute: ${isAuthenticated}`)
-  return (
-    <Route
-      {...props}
-      render={routeProps =>
-        isAuthenticated ? <C {...routeProps} /> : <Link to="/login" />
-      }
-    />
-  )
-}
 
-const UnauthenticatedRoute = ({ component: C, ...props }) => {
-  const { isAuthenticated } = useAuthState()
-  console.log(`UnauthenticatedRoute: ${isAuthenticated}`)
-  return (
-    <Route
-      {...props}
-      render={routeProps =>
-        !isAuthenticated ? <C {...routeProps} /> : <Link to="/" />
-      }
-    />
-  )
-}
 
 function Layout() {
   return (
