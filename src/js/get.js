@@ -11,9 +11,12 @@ export const getAppointment = async () => {
 
     const db = app.firestore()
     const appt = (await db.doc('appointments/test').get()).data()
+
+    // const employees = (await db.collection('employees').where('email', '==', 'm@m.com').get()).docs
+    
+    db.doc('appointments/test').update({new_name: 'Bash'})
     return appt
     
-
 }
 export const GET = async (url, body) => {
     return fetch(url, {

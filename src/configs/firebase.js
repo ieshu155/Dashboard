@@ -20,6 +20,7 @@ export const auth = app.auth()
 
 export const useAuthState = () => {
   const _auth = useContext(auth)
-  return { ..._auth, isAuthenticated: _auth.user != null }
+  console.log("Auth cont: ", _auth);
+  return { ..._auth, isAuthenticated: _auth.currentUser != null }
 }
 
