@@ -2,6 +2,7 @@ import { TextField } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAppointment } from "../../js/get";
+import { fake_db_generator } from "../../js/post";
 
 const Appointments = ({}) => {
 
@@ -11,6 +12,7 @@ const Appointments = ({}) => {
         
         const getAppointments = async () =>{
             const res = await getAppointment()
+            // fake_db_generator()
             setPatient({name: res.name})
         } 
         getAppointments()
