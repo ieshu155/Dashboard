@@ -81,3 +81,11 @@ export const employees = {
     'department': '',
     'type': '',
 }
+
+export const ROUTES = {
+    HOME: '/',
+    DASHBOARD: '/dashboard',
+    APPOINTMENTS: '/appointments',
+    PRESCRIPTIONS: '/prescriptions',
+    LOGIN: '/login'
+}
