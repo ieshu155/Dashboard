@@ -1,48 +1,69 @@
+
+import { auth } from "firebase";
 import * as React from "react";
-import { Routes, Route, Outlet, Link, Redirect } from "react-router-dom";
-// import { Redirect, } from "react-router";
-import { useAuthState } from "./configs/firebase";
+import {
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  useLocation,
+  Navigate,
+  Outlet
+} from "react-router-dom";
+import { ROUTES } from "./js/constants";
 import Appointments from "./Views/appointments/Appointments";
 import Dashboard from "./Views/dashboard/Dashboard";
-import Prescriptions from "./Views/perscriptions/Prescriptions";
+import Welcome from "./welcome";
 
 export default function App() {
   return (
-    <div>
-      <h1>Basic Example</h1>
-
-      <p>
-        This example demonstrates some of the core features of React Router
-        including nested <code>&lt;Route&gt;</code>s,{" "}
-        <code>&lt;Outlet&gt;</code>s, <code>&lt;Link&gt;</code>s, and using a
-        "*" route (aka "splat route") to render a "not found" page when someone
-        visits an unrecognized URL.
-      </p>
-
-      {/* Routes nest inside one another. Nested route paths build upon
-            parent route paths, and nested route elements render inside
-            parent route elements. See the note about <Outlet> below. */}
+    <AuthProvider>
       <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="appointments" element={<Appointments />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="prescriptions" element={<Prescriptions />} />
-
-          {/* Using path="*"" means "match anything", so this route
-                acts like a catch-all for URLs that we don't have explicit
-                routes for. */}
-          <Route path="*" element={<NoMatch />} />
+        <Route element={<Layout />}>
+          <Route path={ROUTES.HOME} element={<Welcome />} />
+          <Route path={ROUTES.LOGIN} element={<Layout2 />} />
+          {/* <Route path={ROUTES.DASHBOARD} element={AuthRoute(<Dashboard />)} />
+          <Route path={ROUTES.APPOINTMENTS} element={AuthRoute(<Appointments />)} /> */}
+          <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
+          <Route path={ROUTES.APPOINTMENTS} element={<Appointments />} />
         </Route>
       </Routes>
+    </AuthProvider>
+  );
+}
+
+const AuthRoute = chiled => <AuthenticatedRoutes>{chiled}</AuthenticatedRoutes>
+function Layout() {
+  const navigate = useNavigate();
+  React.useEffect(() => setTimeout(() => navigate(ROUTES.DASHBOARD), 200), [])
+  return (<div> <Outlet /> </div>);
+}
+
+const AuthContext = React.createContext({user: null});
+const AuthProvider = ({ children }) => <AuthContext.Provider value={{user: auth().currentUser}}>{children}</AuthContext.Provider>;
+const useAuth = () => React.useContext(AuthContext);
+const AuthenticatedRoutes = ({ children }) => {
+  let auth = useAuth();
+  let location = useLocation();
+
+  if (!auth.user) {
+    return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
+  }
+
+  return children;
+}
+
+function LoginPage() {
+
+  return (
+    <div>
+      <p>LOGIN PAGE HOLDER</p>
+
     </div>
   );
 }
 
-
-
-
-function Layout() {
+function Layout2() {
   return (
     <div>
       {/* A "layout route" is a good place to put markup you want to
@@ -50,16 +71,16 @@ function Layout() {
       <nav>
         <ul>
           <li>
-            <Link to="/">Home</Link>
+            <Link to={ROUTES.HOME}>Home</Link>
           </li>
           <li>
-            <Link to="/appointments">Appointments</Link>
+            <Link to={ROUTES.APPOINTMENTS}>Appointments</Link>
           </li>
           <li>
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to={ROUTES.DASHBOARD}>Dashboard</Link>
           </li>
           <li>
-            <Link to="/prescriptions">Prescriptions</Link>
+            <Link to={ROUTES.PRESCRIPTIONS}>Prescriptions</Link>
           </li>
         </ul>
       </nav>
@@ -70,41 +91,6 @@ function Layout() {
           so you can think about this <Outlet> as a placeholder for
           the child routes we defined above. */}
       <Outlet />
-    </div>
-  );
-}
-
-// function Home() {
-//   return (
-//     <div>
-//       <h2>Home</h2>
-//     </div>
-//   );
-// }
-
-// function About() {
-//   return (
-//     <div>
-//       <h2>About</h2>
-//     </div>
-//   );
-// }
-
-// function Dashboard() {
-//   return (
-//     <div>
-//       <h2>Dashboard</h2>
-//     </div>
-//   );
-// }
-
-function NoMatch() {
-  return (
-    <div>
-      <h2>Nothing to see here!</h2>
-      <p>
-        <Link to="/">Go to the home page</Link>
-      </p>
     </div>
   );
 }

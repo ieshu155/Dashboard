@@ -588,3 +588,86 @@
 .margin-r-xxx{
   margin-right: 3rem;
 }
+
+
+.click-main:active {
+  background-color: var(--pm_main_color) !important;
+  transition: 0.3s !important;
+  cursor: pointer !important;
+}
+
+.click-secondary:active {
+  background-color: var(--pm_secondary_color) !important;
+  transition: 0.3s !important;
+  cursor: pointer !important;
+}
+
+.click-main-text:active {
+  color: var(--pm_main-color) !important;
+  transition: 0.3s !important;
+  cursor: pointer !important;
+}
+
+.click-secondary-text:active {
+  color: var(--pm_secondary-color) !important;
+  transition: 0.3s !important;
+  cursor: pointer !important;
+}
+
+.click-dark-text:active {
+  color: var(--pm_dark) !important;
+  transition: 0.3s !important;
+  cursor: pointer !important;
+}
+
+.font-lable-s {
+  font-size: 0.8rem;
+  font-weight: 100;
+}
+
+.font-lable-m {
+  font-size: 1rem;
+  font-weight: 100;
+}
+
+.font-lable-l {
+  font-size: 1.2rem;
+  font-weight: 100;
+}
+
+.font-lable-x {
+  font-size: 1.5rem;
+  font-weight: 100;
+}
+
+.font-title-s {
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.font-title-m {
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.font-title-l {
+  font-size: 2.3rem;
+  font-weight: 400;
+}
+
+.font-title-x {
+  font-size: 2.8rem;
+  font-weight: 400;
+}
+
+.font-tajawal {
+  font-family: "tajawal";
+}
+
+.font-roboto {
+  font-family: "roboto";
+}
+
+.font-roboto-mono {
+  font-family: "roboto-mono";
+}
