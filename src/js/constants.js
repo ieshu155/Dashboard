@@ -87,5 +87,6 @@ export const ROUTES = {
     DASHBOARD: '/dashboard',
     APPOINTMENTS: '/appointments',
     PRESCRIPTIONS: '/prescriptions',
-    LOGIN: '/login'
+    LOGIN: '/login',
+    DIAGNOSIS: '/diagnosis'
 }

@@ -13,6 +13,7 @@ import {
 import { ROUTES } from "./js/constants";
 import Appointments from "./Views/appointments/Appointments";
 import Dashboard from "./Views/dashboard/Dashboard";
+import Diagnosis from "./Views/diagnosis/Diagnosis";
 import Welcome from "./welcome";
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
           <Route path={ROUTES.APPOINTMENTS} element={AuthRoute(<Appointments />)} /> */}
           <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
           <Route path={ROUTES.APPOINTMENTS} element={<Appointments />} />
+          <Route path={ROUTES.DIAGNOSIS} element={<Diagnosis />} />
         </Route>
       </Routes>
     </AuthProvider>
@@ -81,6 +83,9 @@ function Layout2() {
           </li>
           <li>
             <Link to={ROUTES.PRESCRIPTIONS}>Prescriptions</Link>
+          </li>
+          <li>
+            <Link to={ROUTES.DIAGNOSIS}>Diagnosis</Link>
           </li>
         </ul>
       </nav>
